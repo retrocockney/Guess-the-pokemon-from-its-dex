@@ -6,13 +6,10 @@ async function checkGuess() {
     return;
   }
 
-  // Convert spaces to hyphens for API lookup
-  let apiGuess = guess.replace(/\s+/g, "-");
+  // Fix spaces to hyphens for names like scream tail
+  guess = guess.replace(/\s+/g, "-");
 
-  // Convert currentPokemon name to lowercase for comparison
-  let correctName = currentPokemon.name.toLowerCase();
-
-  if (apiGuess === correctName || guess === correctName || guess.replace(/-/g, " ") === correctName) {
+  if (guess === currentPokemon.name) {
     score++;
     document.getElementById("result").innerText =
       "Correct! It is " + currentPokemon.name.toUpperCase() + "!";
@@ -20,9 +17,8 @@ async function checkGuess() {
     return;
   }
 
-  // Check generation of guessed Pokémon
   try {
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${apiGuess}`);
+    const response = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${guess}`);
     const guessData = await response.json();
     const guessGen = getGeneration(guessData.id);
 
