@@ -1,0 +1,44 @@
+async function checkGuess() {
+  let guess = document.getElementById("guessInput").value.trim().toLowerCase();
+
+  if (!guess) {
+    document.getElementById("result").innerText = "Please enter a guess!";
+    return;
+  }
+
+  // Convert spaces to hyphens for API lookup
+  let apiGuess = guess.replace(/\s+/g, "-");
+
+  // Convert currentPokemon name to lowercase for comparison
+  let correctName = currentPokemon.name.toLowerCase();
+
+  if (apiGuess === correctName || guess === correctName || guess.replace(/-/g, " ") === correctName) {
+    score++;
+    document.getElementById("result").innerText =
+      "Correct! It is " + currentPokemon.name.toUpperCase() + "!";
+    document.getElementById("score").innerText = "Score: " + score;
+    return;
+  }
+
+  // Check generation of guessed Pokémon
+  try {
+    const response = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${apiGuess}`);
+    const guessData = await response.json();
+    const guessGen = getGeneration(guessData.id);
+
+    if (guessGen < currentPokemon.gen) {
+      document.getElementById("result").innerText =
+        "Wrong! Your guess is from an older generation.";
+    } else if (guessGen > currentPokemon.gen) {
+      document.getElementById("result").innerText =
+        "Wrong! Your guess is from a newer generation.";
+    } else {
+      document.getElementById("result").innerText =
+        "Wrong! Your guess is from the same generation.";
+    }
+
+  } catch {
+    document.getElementById("result").innerText =
+      "That Pokémon does not exist!";
+  }
+}
